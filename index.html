@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Destro AI</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #e0f7ff;
+}
+.container {
+    width: 95%;
+    max-width: 420px;
+    background: #111827;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,150,255,0.3);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+h2 {
+    text-align: center;
+    margin: 0 0 10px 0;
+    color: #38bdf8;
+}
+.contact {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 20px;
+    text-decoration: none;
+    color: #38bdf8;
+}
+#chatbox {
+    flex: 1;
+    overflow-y: auto;
+    background: #0f172a;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.message {
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    animation: fade 0.3s ease-in-out;
+}
+.user {
+    background: #2563eb;
+    align-self: flex-end;
+}
+.ai {
+    background: #1e293b;
+    align-self: flex-start;
+}
+.input-area {
+    display: flex;
+}
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+button {
+    margin-left: 8px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    background: #38bdf8;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+button:hover {
+    background: #0ea5e9;
+}
+@keyframes fade {
+    from {opacity:0; transform:translateY(5px);}
+    to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <a href="https://wa.me/62895404399397" class="contact" target="_blank">📞</a>
+    <h2>🤖 Destro AI</h2>
+
+    <div id="chatbox">
+        <div class="message ai">Hai saya Destro AI 👋</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Tanya sesuatu..." onkeydown="if(event.key==='Enter') kirim()">
+        <button onclick="kirim()">Kirim</button>
+    </div>
+</div>
+
+<script>
+async function kirim() {
+    const input = document.getElementById("userInput");
+    const chatbox = document.getElementById("chatbox");
+    const pesan = input.value;
+
+    if (!pesan) return;
+
+    chatbox.innerHTML += `<div class="message user">${pesan}</div>`;
+    chatbox.innerHTML += `<div class="message ai">Mengetik...</div>`;
+    chatbox.scrollTop = chatbox.scrollHeight;
+    input.value = "";
+
+    try {
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: pesan })
+        });
+
+        const data = await response.json();
+
+        chatbox.lastChild.remove();
+
+        const jawaban = data.reply || JSON.stringify(data);
+
+
+        chatbox.innerHTML += `<div class="message ai">${jawaban}</div>`;
+
+    } catch (err) {
+        chatbox.lastChild.remove();
+        chatbox.innerHTML += `<div class="message ai">Server error ⚠️</div>`;
+    }
+
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+
+}
+</script>
+</body>
+</html>
